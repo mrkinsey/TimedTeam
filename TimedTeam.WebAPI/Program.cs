@@ -13,7 +13,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
     {
-        c.SwaggerDoc("v1", new OpenApiInfo { Title = "ElevenNote.WebApi", Version = "v1" });
+        c.SwaggerDoc("v1", new OpenApiInfo { Title = "TimedTeam.WebApi", Version = "v1" });
         c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
         {
             Name = "Authorization",
@@ -43,13 +43,15 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 });
 
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IPostService, PostService>();
 
 builder.Services.AddAuthentication(opt =>
 {
     opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; //Bearer token "Magic String"
     opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(opt =>
-{ // These are the parameters in which the bearer authentication is is going to work
+{ // These are the parameters in which the bearer authentication is going to work
     opt.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true, // Things come from us from within the API

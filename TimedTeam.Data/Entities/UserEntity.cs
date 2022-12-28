@@ -21,4 +21,6 @@ public class UserEntity
 
     [Required]
     public DateTime DateCreated { get; set; }
+
+    public List<PostEntity> Posts { get; set; }
 }
