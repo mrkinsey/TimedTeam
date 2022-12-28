@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace TimedTeam.WebAPI.Controllers
@@ -11,10 +12,12 @@ namespace TimedTeam.WebAPI.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _service;
+        private readonly ITokenService _tokenService;
 
-        public UserController(IUserService service)
+        public UserController(IUserService service, ITokenService tokenService)
         {
             _service = service;
+            _tokenService = tokenService;
         }
 
         [HttpPost("Register")]
@@ -33,6 +36,7 @@ namespace TimedTeam.WebAPI.Controllers
             return BadRequest("User could not be registered.");
         }
 
+        [Authorize]
         [HttpGet, Route("{userId}")]
         public async Task<IActionResult> GetById([FromRoute] int userId)
         {
@@ -44,6 +48,19 @@ namespace TimedTeam.WebAPI.Controllers
             }
 
             return Ok(userDetail);
+        }
+
+        [HttpPost, Route("~/api/Token")]
+        public async Task<IActionResult> Token([FromBody] TokenRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var tokenResponse = await _tokenService.GetTokenAsync(request);
+            if (tokenResponse is null)
+                return BadRequest("Invalid username or password.");
+
+            return Ok(tokenResponse);
         }
     }
 }
